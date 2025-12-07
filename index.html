@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>Futebol 2 Jogadores</title>
@@ -39,6 +41,53 @@ if(screen.orientation && screen.orientation.lock){
         }
     }
 
+    .player {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    #verde { background: #00ff00; }
+    #azul { background: #0066ff; }
+
+    .bola {
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .gol {
+        width: 10px;
+        height: 35%; /* proporcional */
+        background: white;
+        position: absolute;
+        top: 32.5%;
+    }
+
+    #golEsquerda { left: 0; }
+    #golDireita { right: 0; }
+
+    #placar {
+        font-size: 25px;
+        margin-top: 10px;
+    }
+
+    #msgGol {
+        position: absolute;
+        width: 100%;
+        top: 40%;
+        font-size: 60px;
+        font-weight: bold;
+        color: yellow;
+        text-shadow: 2px 2px 5px black;
+        display: none;
+        text-align: center;
+    }
+
+    /* Controles para mobile */
     .controles {
         display: none;
         position: absolute;
@@ -59,32 +108,148 @@ if(screen.orientation && screen.orientation.lock){
         font-weight: bold;
     }
 
-    #controlesVerde { left: 20px; }   /* atrás do gol esquerdo */
-    #controlesAzul { right: 20px; }   /* atrás do gol direito */
+    #controlesVerde { left: 20px; }
+    #controlesAzul { right: 20px; }
 </style>
 </head>
 <body>
-...
-<div id="campo">
-   ...
-   <div id="controlesVerde" class="controles">
-       <button data-key="w">↑</button><br>
-       <button data-key="a">←</button>
-       <button data-key="s">↓</button>
-       <button data-key="d">→</button>
-   </div>
 
-   <div id="controlesAzul" class="controles">
-       <button data-key="ArrowUp">↑</button><br>
-       <button data-key="ArrowLeft">←</button>
-       <button data-key="ArrowDown">↓</button>
-       <button data-key="ArrowRight">→</button>
-   </div>
+<h1>⚽ Futebol 2 Jogadores</h1>
+<p>🟢 Jogador 1 (Verde) = W A S D | 🔵 Jogador 2 (Azul) = Setas</p>
+<div id="placar">🟢 0 x 0 🔵</div>
+
+<div id="campo">
+    <div id="golEsquerda" class="gol"></div>
+    <div id="golDireita" class="gol"></div>
+
+    <div id="verde" class="player"></div>
+    <div id="azul" class="player"></div>
+    <div id="bola" class="bola"></div>
+
+    <div id="msgGol">GOL!</div>
+
+    <!-- Controles Mobile -->
+    <div id="controlesVerde" class="controles">
+        <button data-key="w">↑</button><br>
+        <button data-key="a">←</button>
+        <button data-key="s">↓</button>
+        <button data-key="d">→</button>
+    </div>
+
+    <div id="controlesAzul" class="controles">
+        <button data-key="ArrowUp">↑</button><br>
+        <button data-key="ArrowLeft">←</button>
+        <button data-key="ArrowDown">↓</button>
+        <button data-key="ArrowRight">→</button>
+    </div>
 </div>
-...
+
 <script>
-document.querySelectorAll(".controles button").forEach(btn=>{
-    btn.addEventListener("touchstart", ()=> keys[btn.dataset.key] = true);
-    btn.addEventListener("touchend", ()=> keys[btn.dataset.key] = false);
-});
+let campo = document.getElementById("campo");
+let campoW = campo.offsetWidth;
+let campoH = campo.offsetHeight;
+
+let verdeX = campoW*0.15, verdeY = campoH*0.45;
+let azulX = campoW*0.75, azulY = campoH*0.45;
+let bolaX = campoW*0.47, bolaY = campoH*0.47;
+
+let golVerde = 0;
+let golAzul = 0;
+
+const speed = 3;
+let keys = {};
+
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+function moverJogadores() {
+    if(keys["w"] || keys["W"]) verdeY -= speed;
+    if(keys["s"] || keys["S"]) verdeY += speed;
+    if(keys["a"] || keys["A"]) verdeX -= speed;
+    if(keys["d"] || keys["D"]) verdeX += speed;
+
+    if(keys["ArrowUp"]) azulY -= speed;
+    if(keys["ArrowDown"]) azulY += speed;
+    if(keys["ArrowLeft"]) azulX -= speed;
+    if(keys["ArrowRight"]) azulX += speed;
+
+    verdeX = Math.max(0, Math.min(campoW-30, verdeX));
+    verdeY = Math.max(0, Math.min(campoH-30, verdeY));
+    azulX = Math.max(0, Math.min(campoW-30, azulX));
+    azulY = Math.max(0, Math.min(campoH-30, azulY));
+}
+
+function empurrarBola() {
+    let dxV = verdeX - bolaX;
+    let dyV = verdeY - bolaY;
+    if(Math.hypot(dxV, dyV) < 30){ bolaX -= dxV*0.12; bolaY -= dyV*0.12; }
+
+    let dxA = azulX - bolaX;
+    let dyA = azulY - bolaY;
+    if(Math.hypot(dxA, dyA) < 30){ bolaX -= dxA*0.12; bolaY -= dyA*0.12; }
+
+    bolaX = Math.max(0, Math.min(campoW-20, bolaX));
+    bolaY = Math.max(0, Math.min(campoH-20, bolaY));
+}
+
+function mostrarGol() {
+    const msg = document.getElementById("msgGol");
+    msg.style.display = "block";
+    setTimeout(() => { msg.style.display = "none"; }, 1500);
+}
+
+function checarGol(){
+    if(bolaX >= campoW-30 && bolaY > campoH*0.325 && bolaY < campoH*0.675){
+        golVerde++;
+        mostrarGol();
+        resetar();
+    }
+    if(bolaX <= 10 && bolaY > campoH*0.325 && bolaY < campoH*0.675){
+        golAzul++;
+        mostrarGol();
+        resetar();
+    }
+    document.getElementById("placar").innerText = `🟢 ${golVerde} x ${golAzul} 🔵`;
+}
+
+function resetar(){
+    verdeX=campoW*0.15; verdeY=campoH*0.45;
+    azulX=campoW*0.75; azulY=campoH*0.45;
+    bolaX=campoW*0.47; bolaY=campoH*0.47;
+}
+
+function desenhar(){
+    document.getElementById("verde").style.left = verdeX+"px";
+    document.getElementById("verde").style.top = verdeY+"px";
+    document.getElementById("azul").style.left = azulX+"px";
+    document.getElementById("azul").style.top = azulY+"px";
+    document.getElementById("bola").style.left = bolaX+"px";
+    document.getElementById("bola").style.top = bolaY+"px";
+}
+
+function loop(){
+    moverJogadores();
+    empurrarBola();
+    checarGol();
+    desenhar();
+    requestAnimationFrame(loop);
+}
+
+loop();
+
+function isMobile(){
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+if(isMobile()){
+    document.getElementById("controlesVerde").style.display = "block";
+    document.getElementById("controlesAzul").style.display = "block";
+
+    document.querySelectorAll(".controles button").forEach(btn=>{
+        btn.addEventListener("touchstart", ()=> keys[btn.dataset.key] = true);
+        btn.addEventListener("touchend", ()=> keys[btn.dataset.key] = false);
+    });
+}
 </script>
+</body>
+</html>
