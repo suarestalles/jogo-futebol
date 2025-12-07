@@ -1,14 +1,20 @@
-<!DOCTYPE html>
-<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>Futebol 2 Jogadores</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script>
+if(screen.orientation && screen.orientation.lock){
+    screen.orientation.lock("landscape").catch(()=>{});
+}
+</script>
 <style>
     body {
         background: #1c8c1c;
         color: white;
         text-align: center;
         font-family: Arial;
+        margin: 0;
+        overflow: hidden;
     }
 
     #campo {
@@ -21,57 +27,22 @@
         overflow: hidden;
     }
 
-    .player {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        position: absolute;
+    @media (max-width: 900px) {
+        #campo {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            border: none;
+        }
+        .controles {
+            display: block;
+        }
     }
 
-    #verde { background: #00ff00; }
-    #azul { background: #0066ff; }
-
-    .bola {
-        width: 20px;
-        height: 20px;
-        background: white;
-        border-radius: 50%;
-        position: absolute;
-    }
-
-    .gol {
-        width: 10px;
-        height: 140px;
-        background: white;
-        position: absolute;
-        top: 130px;
-    }
-
-    #golEsquerda { left: 0; }
-    #golDireita { right: 0; }
-
-    #placar {
-        font-size: 25px;
-        margin-top: 10px;
-    }
-
-    #msgGol {
-        position: absolute;
-        width: 100%;
-        top: 150px;
-        font-size: 60px;
-        font-weight: bold;
-        color: yellow;
-        text-shadow: 2px 2px 5px black;
-        display: none;
-        text-align: center;
-    }
-
-    /* Controles para mobile */
     .controles {
-        display: none; /* só aparece em mobile */
+        display: none;
         position: absolute;
-        bottom: -160px; /* atrás do gol */
+        bottom: 20px;
         width: 120px;
         text-align: center;
     }
@@ -88,151 +59,32 @@
         font-weight: bold;
     }
 
-    #controlesVerde { left: -140px; }  /* atrás do gol esquerdo */
-    #controlesAzul { right: -140px; }  /* atrás do gol direito */
+    #controlesVerde { left: 20px; }   /* atrás do gol esquerdo */
+    #controlesAzul { right: 20px; }   /* atrás do gol direito */
 </style>
 </head>
 <body>
-
-<h1>⚽ Futebol 2 Jogadores</h1>
-<p>🟢 Jogador 1 (Verde) = W A S D | 🔵 Jogador 2 (Azul) = Setas</p>
-<div id="placar">🟢 0 x 0 🔵</div>
-
+...
 <div id="campo">
-    <div id="golEsquerda" class="gol"></div>
-    <div id="golDireita" class="gol"></div>
+   ...
+   <div id="controlesVerde" class="controles">
+       <button data-key="w">↑</button><br>
+       <button data-key="a">←</button>
+       <button data-key="s">↓</button>
+       <button data-key="d">→</button>
+   </div>
 
-    <div id="verde" class="player"></div>
-    <div id="azul" class="player"></div>
-    <div id="bola" class="bola"></div>
-
-    <div id="msgGol">GOL!</div>
-
-    <!-- Controles Mobile -->
-    <div id="controlesVerde" class="controles">
-        <button data-key="w">↑</button><br>
-        <button data-key="a">←</button>
-        <button data-key="s">↓</button>
-        <button data-key="d">→</button>
-    </div>
-
-    <div id="controlesAzul" class="controles">
-        <button data-key="ArrowUp">↑</button><br>
-        <button data-key="ArrowLeft">←</button>
-        <button data-key="ArrowDown">↓</button>
-        <button data-key="ArrowRight">→</button>
-    </div>
+   <div id="controlesAzul" class="controles">
+       <button data-key="ArrowUp">↑</button><br>
+       <button data-key="ArrowLeft">←</button>
+       <button data-key="ArrowDown">↓</button>
+       <button data-key="ArrowRight">→</button>
+   </div>
 </div>
-
+...
 <script>
-let verdeX = 100, verdeY = 180;   // Jogador 1 (WASD)
-let azulX = 550, azulY = 180;     // Jogador 2 (Setas)
-let bolaX = 330, bolaY = 190;
-
-let golVerde = 0;
-let golAzul = 0;
-
-const speed = 3;
-let keys = {};
-
-document.addEventListener("keydown", e => keys[e.key] = true);
-document.addEventListener("keyup", e => keys[e.key] = false);
-
-function moverJogadores() {
-    // Jogador 1 (Verde) - WASD
-    if(keys["w"] || keys["W"]) verdeY -= speed;
-    if(keys["s"] || keys["S"]) verdeY += speed;
-    if(keys["a"] || keys["A"]) verdeX -= speed;
-    if(keys["d"] || keys["D"]) verdeX += speed;
-
-    // Jogador 2 (Azul) - Setas
-    if(keys["ArrowUp"]) azulY -= speed;
-    if(keys["ArrowDown"]) azulY += speed;
-    if(keys["ArrowLeft"]) azulX -= speed;
-    if(keys["ArrowRight"]) azulX += speed;
-
-    // Limites
-    verdeX = Math.max(0, Math.min(670, verdeX));
-    verdeY = Math.max(0, Math.min(370, verdeY));
-    azulX = Math.max(0, Math.min(670, azulX));
-    azulY = Math.max(0, Math.min(370, azulY));
-}
-
-function empurrarBola() {
-    let dxV = verdeX - bolaX;
-    let dyV = verdeY - bolaY;
-    if(Math.hypot(dxV, dyV) < 30){ bolaX -= dxV*0.12; bolaY -= dyV*0.12; }
-
-    let dxA = azulX - bolaX;
-    let dyA = azulY - bolaY;
-    if(Math.hypot(dxA, dyA) < 30){ bolaX -= dxA*0.12; bolaY -= dyA*0.12; }
-
-    bolaX = Math.max(0, Math.min(680, bolaX));
-    bolaY = Math.max(0, Math.min(380, bolaY));
-}
-
-function mostrarGol() {
-    const msg = document.getElementById("msgGol");
-    msg.style.display = "block";
-    setTimeout(() => { msg.style.display = "none"; }, 1500);
-}
-
-function checarGol(){
-    // Gol do Jogador 1 (Verde) → lado direito
-    if(bolaX >= 670 && bolaY > 130 && bolaY < 270){
-        golVerde++;
-        mostrarGol();
-        resetar();
-    }
-    // Gol do Jogador 2 (Azul) → lado esquerdo
-    if(bolaX <= 10 && bolaY > 130 && bolaY < 270){
-        golAzul++;
-        mostrarGol();
-        resetar();
-    }
-    document.getElementById("placar").innerText = `🟢 ${golVerde} x ${golAzul} 🔵`;
-}
-
-function resetar(){
-    verdeX=100; verdeY=180;
-    azulX=550; azulY=180;
-    bolaX=330; bolaY=190;
-}
-
-function desenhar(){
-    document.getElementById("verde").style.left = verdeX+"px";
-    document.getElementById("verde").style.top = verdeY+"px";
-    document.getElementById("azul").style.left = azulX+"px";
-    document.getElementById("azul").style.top = azulY+"px";
-    document.getElementById("bola").style.left = bolaX+"px";
-    document.getElementById("bola").style.top = bolaY+"px";
-}
-
-function loop(){
-    moverJogadores();
-    empurrarBola();
-    checarGol();
-    desenhar();
-    requestAnimationFrame(loop);
-}
-
-loop();
-
-/* --- Mostrar controles em mobile --- */
-function isMobile(){
-    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
-if(isMobile()){
-    document.getElementById("controlesVerde").style.display = "block";
-    document.getElementById("controlesAzul").style.display = "block";
-
-    // Botões simulam teclas
-    document.querySelectorAll(".controles button").forEach(btn=>{
-        btn.addEventListener("touchstart", ()=> keys[btn.dataset.key] = true);
-        btn.addEventListener("touchend", ()=> keys[btn.dataset.key] = false);
-    });
-}
+document.querySelectorAll(".controles button").forEach(btn=>{
+    btn.addEventListener("touchstart", ()=> keys[btn.dataset.key] = true);
+    btn.addEventListener("touchend", ()=> keys[btn.dataset.key] = false);
+});
 </script>
-</body>
-</html>
