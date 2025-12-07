@@ -71,7 +71,7 @@
 <body>
 
 <h1>⚽ Futebol 2 Jogadores</h1>
-<p>🟢 Verde = Setas | 🔵 Azul = W A S D</p>
+<p>🟢 Jogador 1 (Verde) = W A S D | 🔵 Jogador 2 (Azul) = Setas</p>
 <div id="placar">🟢 0 x 0 🔵</div>
 
 <div id="campo">
@@ -86,31 +86,31 @@
 </div>
 
 <script>
-let verdeX = 100, verdeY = 180;
-let azulX = 550, azulY = 180;
+let verdeX = 100, verdeY = 180;   // Jogador 1 (WASD)
+let azulX = 550, azulY = 180;     // Jogador 2 (Setas)
 let bolaX = 330, bolaY = 190;
 
 let golVerde = 0;
 let golAzul = 0;
 
-const speed = 3; // velocidade reduzida
+const speed = 3;
 let keys = {};
 
 document.addEventListener("keydown", e => keys[e.key] = true);
 document.addEventListener("keyup", e => keys[e.key] = false);
 
 function moverJogadores() {
-    // Verde (Setas)
-    if(keys["ArrowUp"]) verdeY -= speed;
-    if(keys["ArrowDown"]) verdeY += speed;
-    if(keys["ArrowLeft"]) verdeX -= speed;
-    if(keys["ArrowRight"]) verdeX += speed;
+    // Jogador 1 (Verde) - WASD
+    if(keys["w"] || keys["W"]) verdeY -= speed;
+    if(keys["s"] || keys["S"]) verdeY += speed;
+    if(keys["a"] || keys["A"]) verdeX -= speed;
+    if(keys["d"] || keys["D"]) verdeX += speed;
 
-    // Azul (WASD)
-    if(keys["w"] || keys["W"]) azulY -= speed;
-    if(keys["s"] || keys["S"]) azulY += speed;
-    if(keys["a"] || keys["A"]) azulX -= speed;
-    if(keys["d"] || keys["D"]) azulX += speed;
+    // Jogador 2 (Azul) - Setas
+    if(keys["ArrowUp"]) azulY -= speed;
+    if(keys["ArrowDown"]) azulY += speed;
+    if(keys["ArrowLeft"]) azulX -= speed;
+    if(keys["ArrowRight"]) azulX += speed;
 
     // Limites
     verdeX = Math.max(0, Math.min(670, verdeX));
@@ -139,11 +139,13 @@ function mostrarGol() {
 }
 
 function checarGol(){
+    // Gol do Jogador 1 (Verde) - direita
     if(bolaX > 690 && bolaY > 130 && bolaY < 270){
         golVerde++;
         mostrarGol();
         resetar();
     }
+    // Gol do Jogador 2 (Azul) - esquerda
     if(bolaX < 10 && bolaY > 130 && bolaY < 270){
         golAzul++;
         mostrarGol();
