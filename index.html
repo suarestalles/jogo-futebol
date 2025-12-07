@@ -140,19 +140,20 @@ function mostrarGol() {
 
 function checarGol(){
     // Gol do Jogador 1 (Verde) → lado direito
-    if(bolaX > 690 && bolaY > 130 && bolaY < 270){
+    if(bolaX >= 670 && bolaY > 130 && bolaY < 270){
         golVerde++;
         mostrarGol();
         resetar();
     }
     // Gol do Jogador 2 (Azul) → lado esquerdo
-    if(bolaX < 10 && bolaY > 130 && bolaY < 270){
+    if(bolaX <= 10 && bolaY > 130 && bolaY < 270){
         golAzul++;
         mostrarGol();
         resetar();
     }
     document.getElementById("placar").innerText = `🟢 ${golVerde} x ${golAzul} 🔵`;
 }
+
 
 function resetar(){
     verdeX=100; verdeY=180;
