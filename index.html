@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Futebol 2 Jogadores</title>
+<style>
+    body {
+        background: #1c8c1c;
+        color: white;
+        text-align: center;
+        font-family: Arial;
+    }
+
+    #campo {
+        width: 700px;
+        height: 400px;
+        background: #27ae60;
+        border: 5px solid white;
+        margin: 20px auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .player {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    #verde { background: #00ff00; }
+    #azul { background: #0066ff; }
+
+    .bola {
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .gol {
+        width: 10px;
+        height: 140px;
+        background: white;
+        position: absolute;
+        top: 130px;
+    }
+
+    #golEsquerda { left: 0; }
+    #golDireita { right: 0; }
+
+    #placar {
+        font-size: 25px;
+        margin-top: 10px;
+    }
+
+    #msgGol {
+        position: absolute;
+        width: 100%;
+        top: 150px;
+        font-size: 60px;
+        font-weight: bold;
+        color: yellow;
+        text-shadow: 2px 2px 5px black;
+        display: none;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+
+<h1>⚽ Futebol 2 Jogadores</h1>
+<p>🟢 Verde = Setas | 🔵 Azul = W A S D</p>
+<div id="placar">🟢 0 x 0 🔵</div>
+
+<div id="campo">
+    <div id="golEsquerda" class="gol"></div>
+    <div id="golDireita" class="gol"></div>
+
+    <div id="verde" class="player"></div>
+    <div id="azul" class="player"></div>
+    <div id="bola" class="bola"></div>
+
+    <div id="msgGol">GOL!</div>
+</div>
+
+<script>
+let verdeX = 100, verdeY = 180;
+let azulX = 550, azulY = 180;
+let bolaX = 330, bolaY = 190;
+
+let golVerde = 0;
+let golAzul = 0;
+
+const speed = 3; // velocidade reduzida
+let keys = {};
+
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+function moverJogadores() {
+    // Verde (Setas)
+    if(keys["ArrowUp"]) verdeY -= speed;
+    if(keys["ArrowDown"]) verdeY += speed;
+    if(keys["ArrowLeft"]) verdeX -= speed;
+    if(keys["ArrowRight"]) verdeX += speed;
+
+    // Azul (WASD)
+    if(keys["w"] || keys["W"]) azulY -= speed;
+    if(keys["s"] || keys["S"]) azulY += speed;
+    if(keys["a"] || keys["A"]) azulX -= speed;
+    if(keys["d"] || keys["D"]) azulX += speed;
+
+    // Limites
+    verdeX = Math.max(0, Math.min(670, verdeX));
+    verdeY = Math.max(0, Math.min(370, verdeY));
+    azulX = Math.max(0, Math.min(670, azulX));
+    azulY = Math.max(0, Math.min(370, azulY));
+}
+
+function empurrarBola() {
+    let dxV = verdeX - bolaX;
+    let dyV = verdeY - bolaY;
+    if(Math.hypot(dxV, dyV) < 30){ bolaX -= dxV*0.12; bolaY -= dyV*0.12; }
+
+    let dxA = azulX - bolaX;
+    let dyA = azulY - bolaY;
+    if(Math.hypot(dxA, dyA) < 30){ bolaX -= dxA*0.12; bolaY -= dyA*0.12; }
+
+    bolaX = Math.max(0, Math.min(680, bolaX));
+    bolaY = Math.max(0, Math.min(380, bolaY));
+}
+
+function mostrarGol() {
+    const msg = document.getElementById("msgGol");
+    msg.style.display = "block";
+    setTimeout(() => { msg.style.display = "none"; }, 1500);
+}
+
+function checarGol(){
+    if(bolaX > 690 && bolaY > 130 && bolaY < 270){
+        golVerde++;
+        mostrarGol();
+        resetar();
+    }
+    if(bolaX < 10 && bolaY > 130 && bolaY < 270){
+        golAzul++;
+        mostrarGol();
+        resetar();
+    }
+    document.getElementById("placar").innerText = `🟢 ${golVerde} x ${golAzul} 🔵`;
+}
+
+function resetar(){
+    verdeX=100; verdeY=180;
+    azulX=550; azulY=180;
+    bolaX=330; bolaY=190;
+}
+
+function desenhar(){
+    document.getElementById("verde").style.left = verdeX+"px";
+    document.getElementById("verde").style.top = verdeY+"px";
+    document.getElementById("azul").style.left = azulX+"px";
+    document.getElementById("azul").style.top = azulY+"px";
+    document.getElementById("bola").style.left = bolaX+"px";
+    document.getElementById("bola").style.top = bolaY+"px";
+}
+
+function loop(){
+    moverJogadores();
+    empurrarBola();
+    checarGol();
+    desenhar();
+    requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
