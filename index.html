@@ -66,6 +66,30 @@
         display: none;
         text-align: center;
     }
+
+    /* Controles para mobile */
+    .controles {
+        display: none; /* só aparece em mobile */
+        position: absolute;
+        bottom: -160px; /* atrás do gol */
+        width: 120px;
+        text-align: center;
+    }
+
+    .controles button {
+        width: 40px;
+        height: 40px;
+        margin: 5px;
+        font-size: 20px;
+        border-radius: 5px;
+        border: none;
+        background: #fff;
+        color: #000;
+        font-weight: bold;
+    }
+
+    #controlesVerde { left: -140px; }  /* atrás do gol esquerdo */
+    #controlesAzul { right: -140px; }  /* atrás do gol direito */
 </style>
 </head>
 <body>
@@ -83,6 +107,21 @@
     <div id="bola" class="bola"></div>
 
     <div id="msgGol">GOL!</div>
+
+    <!-- Controles Mobile -->
+    <div id="controlesVerde" class="controles">
+        <button data-key="w">↑</button><br>
+        <button data-key="a">←</button>
+        <button data-key="s">↓</button>
+        <button data-key="d">→</button>
+    </div>
+
+    <div id="controlesAzul" class="controles">
+        <button data-key="ArrowUp">↑</button><br>
+        <button data-key="ArrowLeft">←</button>
+        <button data-key="ArrowDown">↓</button>
+        <button data-key="ArrowRight">→</button>
+    </div>
 </div>
 
 <script>
@@ -154,7 +193,6 @@ function checarGol(){
     document.getElementById("placar").innerText = `🟢 ${golVerde} x ${golAzul} 🔵`;
 }
 
-
 function resetar(){
     verdeX=100; verdeY=180;
     azulX=550; azulY=180;
@@ -179,6 +217,22 @@ function loop(){
 }
 
 loop();
+
+/* --- Mostrar controles em mobile --- */
+function isMobile(){
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+if(isMobile()){
+    document.getElementById("controlesVerde").style.display = "block";
+    document.getElementById("controlesAzul").style.display = "block";
+
+    // Botões simulam teclas
+    document.querySelectorAll(".controles button").forEach(btn=>{
+        btn.addEventListener("touchstart", ()=> keys[btn.dataset.key] = true);
+        btn.addEventListener("touchend", ()=> keys[btn.dataset.key] = false);
+    });
+}
 </script>
 </body>
 </html>
